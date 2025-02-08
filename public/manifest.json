@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Font Finder",
+  "version": "1.0",
+  "description": "Identify fonts on any webpage.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Click to activate Font Finder"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}   
