@@ -1,6 +1,8 @@
-chrome.action.onClicked.addListener((tab) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["content.js"],
-    }).catch((error) => console.error("Script execution failed:", error));
+chrome.action.onClicked.addListener(() => {
+  chrome.windows.create({
+      url: chrome.runtime.getURL("popup.html"),
+      type: "popup",
+      width: 300,
+      height: 200
   });
+});

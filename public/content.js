@@ -1,40 +1,60 @@
-    if (!window.__FONT_FINDER_TOOLTIP__) {
-        window.__FONT_FINDER_TOOLTIP__ = document.createElement("div");
-        window.__FONT_FINDER_TOOLTIP__.classList.add("tooltip");
-        document.body.appendChild(window.__FONT_FINDER_TOOLTIP__);
-    }
-    
-    const tooltip = window.__FONT_FINDER_TOOLTIP__;
-    Object.assign(tooltip.style, {
-        position: "absolute",
-        background: "rgba(0, 0, 0, 0.8)",
-        color: "white",
-        padding: "8px",
-        borderRadius: "6px",
-        fontSize: "12px",
-        display: "none",
-        zIndex: "10000",
-    });
-    
-    document.addEventListener("mouseover", (event) => {
-        const element = event.target;
-        if (element && element !== tooltip) {
-        const computedStyle = window.getComputedStyle(element);
-        tooltip.innerHTML = `
-            <div>
-            <p><strong>Font:</strong> ${computedStyle.fontFamily}</p>
-            <p><strong>Size:</strong> ${computedStyle.fontSize}</p>
-            <p><strong>Color:</strong> ${computedStyle.color}</p>
-            <p><strong>Weight:</strong> ${computedStyle.fontWeight}</p>
-            </div>
-        `;
-        tooltip.style.left = `${event.pageX + 10}px`;
-        tooltip.style.top = `${event.pageY + 10}px`;
-        tooltip.style.display = "block";
+let isFontDetailsActive = false;
+let currentTooltip = null;
+
+function showFontDetails(event) {
+    if (isFontDetailsActive) {
+        if (currentTooltip) {
+            document.body.removeChild(currentTooltip);
         }
-    });
-    
-    document.addEventListener("mouseout", () => {
-        tooltip.style.display = "none";
-    });
-    
+
+        const fontDetails = document.createElement('div');
+        fontDetails.style.position = 'absolute';
+        fontDetails.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        fontDetails.style.color = '#fff';
+        fontDetails.style.borderRadius = '5px';
+        fontDetails.style.padding = '8px';
+        fontDetails.style.zIndex = '1000';
+        fontDetails.style.pointerEvents = 'none';
+        const computedStyle = getComputedStyle(event.target);
+        fontDetails.innerText = `Font: ${computedStyle.fontFamily}, Size: ${computedStyle.fontSize}, Color: ${computedStyle.color}`;
+        document.body.appendChild(fontDetails);
+        
+        fontDetails.style.left = `${event.pageX + 10}px`;
+        fontDetails.style.top = `${event.pageY + 10}px`;
+
+        currentTooltip = fontDetails;
+
+        event.target.addEventListener('mouseleave', () => {
+            if (currentTooltip) {
+                document.body.removeChild(currentTooltip);
+                currentTooltip = null;
+            }
+        }, { once: true });
+    }
+}
+
+function activateFontDetails() {
+    if (!isFontDetailsActive) {
+        document.addEventListener('mouseover', showFontDetails);
+        isFontDetailsActive = true;
+    }
+}
+
+function deactivateFontDetails() {
+    if (isFontDetailsActive) {
+        document.removeEventListener('mouseover', showFontDetails);
+        if (currentTooltip) {
+            document.body.removeChild(currentTooltip);
+            currentTooltip = null;
+        }
+        isFontDetailsActive = false;
+    }
+}
+
+chrome.runtime.onMessage.addListener((request) => {
+    if (request.action === 'activateFontDetails') {
+        activateFontDetails();
+    } else if (request.action === 'deactivateFontDetails') {
+        deactivateFontDetails();
+    }
+});

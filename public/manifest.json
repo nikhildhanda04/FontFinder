@@ -2,20 +2,21 @@
   "manifest_version": 3,
   "name": "Font Finder",
   "version": "1.0",
-  "description": "Identify fonts on any webpage.",
-  "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "description": "A Chrome extension to find font details on hover.",
+  "permissions": [
+      "activeTab",
+      "scripting"
+  ],
   "background": {
-    "service_worker": "background.js"
+      "service_worker": "background.js"
   },
   "action": {
-    "default_title": "Click to activate Font Finder"
+      "default_popup": "popup.html"
   },
   "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_end"
-    }
+      {
+          "matches": ["<all_urls>"],
+          "js": ["content.js"]
+      }
   ]
-}   
+}
